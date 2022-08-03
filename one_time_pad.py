@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from typing import Optional
 
 EVERYTHING_BUT_CODEBOOK = {
     "A": "1",
@@ -75,12 +76,10 @@ CODEBOOK = {
     "YESTERDAY": "173",
 }
 CONVERSION_TABLE = {**EVERYTHING_BUT_CODEBOOK, **CODEBOOK}
-DECODE_CONVERSION_TABLE: dict[str, str] = dict(
-    map(reversed, CONVERSION_TABLE.items())
-)
+DECODE_CONVERSION_TABLE = {y: x for x, y in CONVERSION_TABLE.items()}
 
 
-def encode_without_codebook(message):
+def encode_without_codebook(message: str) -> str:
     encoded = []
     for char in message:
         encoded_char = EVERYTHING_BUT_CODEBOOK[char]
@@ -88,7 +87,7 @@ def encode_without_codebook(message):
     return "".join(encoded)
 
 
-def encode_with_codebook(encoded_message):
+def encode_with_codebook(encoded_message: str) -> str:
     encoded_codebook = {}
     for word, code in CODEBOOK.items():
         encoded_codebook[encode_without_codebook(word)] = code
@@ -98,11 +97,11 @@ def encode_with_codebook(encoded_message):
     return "".join(encoded_message)
 
 
-def encode(message):
+def encode(message: str) -> str:
     return encode_with_codebook(encode_without_codebook(message))
 
 
-def decode(encoded_message):
+def decode(encoded_message: str) -> str:
     has_been_decoded_count = 0
     decoded_message = ""
     while decoded_values := _chunk_decode(
@@ -115,28 +114,30 @@ def decode(encoded_message):
     return decoded_message
 
 
-def _chunk_decode(encoded_message, has_been_decoded_count):
+def _chunk_decode(
+    encoded_message: str, has_been_decoded_count: int
+) -> Optional[tuple[str, int]]:
     first_non_decoded_chars = get_first_non_decoded_chars(
         encoded_message, has_been_decoded_count, 3
     )
     if first_non_decoded_chars is None:
-        return
+        return None
     for i in range(3, 0, -1):
         if decoded := DECODE_CONVERSION_TABLE.get(first_non_decoded_chars[:i]):
             has_been_decoded_count += i
             return decoded, has_been_decoded_count
-    return decoded, has_been_decoded_count
+    return None
 
 
 def get_first_non_decoded_chars(
-    encoded_message, has_been_decoded_count, number_of_chars
-):
+    encoded_message: str, has_been_decoded_count: int, number_of_chars: int
+) -> str:
     start = has_been_decoded_count
     end = start + number_of_chars
     return encoded_message[start:end]
 
 
-def decrypt(encrypted_message, relevant_otp):
+def decrypt(encrypted_message: str, relevant_otp: str) -> str:
     decrypted_char_list = []
     for index, encrypted_char in enumerate(encrypted_message):
         corresponding_otp_char = int(relevant_otp[index])
@@ -146,7 +147,7 @@ def decrypt(encrypted_message, relevant_otp):
     return "".join(decrypted_char_list)
 
 
-def encrypt(encoded_message, relevant_otp):
+def encrypt(encoded_message: str, relevant_otp: str) -> str:
     encrypted_char_list = []
     for index, encoded_char in enumerate(encoded_message):
         corresponding_otp_char = int(relevant_otp[index])
