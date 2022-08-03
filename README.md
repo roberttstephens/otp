@@ -1,6 +1,6 @@
 # One Time Pad
 
-This is a one time pad that can be used to generate a random pad, encode the message, and encrypt the message. It can also be used to decode and decrypt the message.
+This is a script that can be used to generate a random one time pad, encode the message, and encrypt the message. It can also be used to decode and decrypt the message.
 
 For encoding and decoding, it makes use of a code book to shorten the message.
 
