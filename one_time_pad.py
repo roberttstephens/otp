@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-from helpers import format_into_five
 
-ALPHABET = {
+EVERYTHING_BUT_CODEBOOK = {
     "A": "1",
     "B": "70",
     "C": "71",
@@ -28,8 +27,6 @@ ALPHABET = {
     "X": "87",
     "Y": "88",
     "Z": "89",
-}
-SPECIAL_CHARS = {
     "FIG": "90",
     ".": "91",
     ":": "92",
@@ -40,8 +37,6 @@ SPECIAL_CHARS = {
     "=": "97",
     "REQ": "98",
     " ": "99",
-}
-INTEGERS = {
     "0": "000",
     "1": "111",
     "2": "222",
@@ -53,7 +48,6 @@ INTEGERS = {
     "8": "888",
     "9": "999",
 }
-
 CODEBOOK = {
     "ABORT": "001",
     "AGENT": "018",
@@ -80,9 +74,10 @@ CODEBOOK = {
     "VERIFY": "167",
     "YESTERDAY": "173",
 }
-EVERYTHING_BUT_CODEBOOK = {**ALPHABET, **INTEGERS, **SPECIAL_CHARS}
 CONVERSION_TABLE = {**EVERYTHING_BUT_CODEBOOK, **CODEBOOK}
-DECODE_CONVERSION_TABLE = dict(map(reversed, CONVERSION_TABLE.items()))
+DECODE_CONVERSION_TABLE: dict[str, str] = dict(
+    map(reversed, CONVERSION_TABLE.items())
+)
 
 
 def encode_without_codebook(message):
@@ -110,15 +105,9 @@ def encode(message):
 def decode(encoded_message):
     has_been_decoded_count = 0
     decoded_message = ""
-    decoded_list = sorted(
-        CONVERSION_TABLE,
-        key=lambda k: len(CONVERSION_TABLE[k]),
-        reverse=True,
-    )
-    # Move the space to just after the numbers.
-    decoded_list.remove(" ")
-    decoded_list.insert(10, " ")
-    while decoded_values := _chunk_decode(encoded_message, has_been_decoded_count):
+    while decoded_values := _chunk_decode(
+        encoded_message, has_been_decoded_count
+    ):
         (decoded, has_been_decoded_count) = decoded_values
         if decoded is None:
             break
